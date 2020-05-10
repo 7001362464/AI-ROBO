@@ -1,0 +1,296 @@
+import time
+import serial
+import speech_recognition as sr
+import pyaudio
+from gtts import gTTS
+from playsound import playsound
+import sys
+import os
+import mathmode
+ardunioserialData=serial.Serial('com5',9600);
+
+class Video(object):
+    def __init__(self,path):
+        self.path = path
+
+    def play(self):
+        from os import startfile
+        startfile(self.path)
+
+class Movie_MP4(Video):
+    type = "MP4"
+def texttospeech(mytext,g): 
+   language = 'en'  
+   myobj = gTTS(text=mytext, lang=language, slow=False) 
+   myobj.save(g) 
+   os.system("mpg321 {}".format(g));
+def sppechtotext():        
+ r = sr.Recognizer()
+ with sr.Microphone() as source:
+     # read the audio data from the default microphone
+     audio_data = r.record(source, duration=5);
+     print("Recognizing...")
+     # convert speech to text
+     text = r.recognize(audio_data)
+     print(text)
+     return text
+def ask():
+  global l
+  global flag4;
+  print("yes")
+  flag4=1;
+  while(1):
+    try:
+        l=l+1
+        texttospeech("do you want to quit","welcome{}.mp3".format(l));
+        playsound('welcome{}.mp3'.format(l))
+        text3=sppechtotext()
+        
+        if(text3=="yes"):
+            return;
+        elif(text3=="no"):
+            print("yes")
+            l=l+1
+            texttospeech("ok tell me something",'welcome{}.mp3'.format(l));
+            playsound('welcome{}.mp3'.format(l))
+            
+            l=l+1
+            text2=sppechtotext()
+            text2=text2.split(" ");
+            print(text2)
+            for i in text2:
+              s=i.upper();
+              print(s);
+              if(s in mathmode.particular1):
+                pao=mathmode.particular1[s.upper()]
+                print(pao);
+                l+=1
+                texttospeech(pao,"welcome{}.mp3".format(l));
+                playsound('welcome{}.mp3'.format(l))
+    except:
+        pass;
+  
+def checklight(name):
+  global l;
+  k=0
+  #check to see if data is on port
+  while(1):
+      if(ardunioserialData.inWaiting()>0):
+        myData=ardunioserialData.readline();
+        print(myData)
+        #convert string to floating point no
+        #distance=float(myData)
+        get=myData.decode('utf-8')
+        if(int(get[0:3])>150 and k==0):
+           print("yes");
+           k=1
+           l+=1
+           texttospeech("{} please off the light either i will not talk to you".format(name),"welcome{}.mp3".format(l));
+           playsound("welcome{}.mp3".format(l))
+        if(int(get[0:3])<150 and k is 1):
+           k=0
+           l+=1
+           texttospeech("thank you {} for the light off".format(name),"welcome{}.mp3".format(l));
+           playsound(r"F:\new ration\ardunio python\welcome{}.mp3".format(l))
+           return;
+        
+def song():
+  global l,name;
+  while(1):
+      try:
+        l+=1
+        
+        texttospeech("{} what you want to listen rabindra sangeet or dance song or love song".format(name),"welcome{}.mp3".format(l));
+        playsound("welcome{}.mp3".format(l))
+    
+        responseofsong=sppechtotext();
+        print(responseofsong);
+        if("rabindranath sangeet" in responseofsong.lower()):
+            response="rabindra sangeet"
+        elif("love song" in responseofsong.lower()):
+            response="love song"
+        else:
+            response="dance song"
+        l+=1
+        texttospeech("ok,you want to listen {},enjoy your song".format(response),"welcome{}.mp3".format(l));
+        playsound('welcome{}.mp3'.format(l))
+        if(response=="dance song"):
+            movie = Movie_MP4(r"E:\music\classic music\01 Cheez Badi - Machine - 320Kbps.mp3")
+            movie.play()
+        elif(response=="love song"):
+            movie = Movie_MP4(r"E:\music\classic music\03 - JM - Aashiqui 2 Mashup [DJMaza.Info].mp3")
+            movie.play()
+        else:
+            movie = Movie_MP4(r"E:\music\Rabindra sangeet\Amar-Mon-Jakhon_(webmusic.in).mp3")
+            movie.play()
+        print("yes")
+        break;
+        
+      except:
+
+            l=l+1
+            texttospeech("{} please answer clearly".format(name),"welcome{}.mp3".format(l));
+            playsound('welcome{}.mp3'.format(l));
+
+def math():
+  global l,name;
+  global flag1;
+  flag1=1
+  l+=1
+  texttospeech("you are now in math mode question please","welcome{}.mp3".format(l));
+  playsound('welcome{}.mp3'.format(l))
+  while(1):
+   try:
+    text=sppechtotext();
+    for i in text.split(' '):
+        if i.upper() in mathmode.particular1:
+            pao=mathmode.particular1[i.upper()]
+            l+=1
+            texttospeech("{}".format(pao),"welcome{}.mp3".format(l));
+            playsound('welcome{}.mp3'.format(l))
+            break;
+        elif i.upper() in mathmode.particular:
+            r=mathmode.list(text);
+            j=mathmode.particular[i.upper()](r[0],r[1]);
+            pao=j;
+            l+=1
+            texttospeech("your answer is {}".format(int(pao)),"welcome{}.mp3".format(l));
+            playsound('welcome{}.mp3'.format(l))
+            try:
+                l=l+1
+                text2=sppechtotext()
+                if text2.upper() in mathmode.particular1:
+                   pao=mathmode.particular1[text2.upper()]
+                   l+=1
+                   texttospeech(pao,"welcome{}.mp3".format(l));
+                   playsound('welcome{}.mp3'.format(l))
+            except:
+                pass;
+                
+                
+            break;
+        elif "exit" in text.split(' '):
+            pao="sure, you can thank you, see you again";
+            l+=1
+            texttospeech(pao,"welcome{}.mp3".format(l));
+            playsound('welcome{}.mp3'.format(l))
+            return;
+    else:
+        pao="out of my capability"
+        l+=1
+        texttospeech(pao,"welcome{}.mp3".format(l));
+        playsound('welcome{}.mp3'.format(l))
+        
+   except:
+    l+=1
+    texttospeech("{} please question again".format(name),"welcome{}.mp3".format(l));
+    playsound('welcome{}.mp3'.format(l))
+       
+
+       
+    
+l=0
+flag1=0
+flag4=0;
+while(1==1):#loop forever
+  l+=1
+  texttospeech("welcome sir in our smart room my name is AI robot please tell me your name","welcome{}.mp3".format(l));
+  playsound(r"F:\new ration\ardunio python\welcome{}.mp3".format(l))
+  while(1==1):
+      try:
+        name=sppechtotext();
+        print(name)
+        l+=1
+        texttospeech("ok your name is{}".format(name),"welcome{}.mp3".format(l));
+        playsound(r"F:\new ration\ardunio python\welcome{}.mp3".format(l))
+        break;
+      except:
+        l+=1
+        texttospeech("i could not catch your name  please tell me once again","welcome{}.mp3".format(l));
+        playsound('welcome{}.mp3'.format(l))
+  checklight(name);
+  
+  
+
+  while(1):
+       while(1):
+        try:
+         flag=0
+         l=l+1
+         texttospeech("in which mode you want to talk with me song or math mode or ask mode","welcome{}.mp3".format(l));
+         playsound(r"F:\new ration\ardunio python\welcome{}.mp3".format(l))
+         option=sppechtotext();
+         if("song" in option):
+           break;
+         elif("math" in option):
+           math();
+           flag1=0
+           break;
+         else:
+             print("yes")
+             ask();
+        except:
+           if(flag1==1):
+               l+=1
+               texttospeech("{} please clearly say".format(name),"welcome{}.mp3".format(l));
+               playsound('welcome{}.mp3'.format(l));
+               math();
+               flag1=0
+               break;
+           elif(flag4==1):
+                l+=1
+                texttospeech("{} please clearly say".format(name),"welcome{}.mp3".format(l));
+                playsound('welcome{}.mp3'.format(l));
+                ask();
+                flag1=0
+                break;
+                
+
+  
+       song();
+       while(1): 
+      
+        try:
+        
+         name1=sppechtotext();
+         print(name1)
+         l+=1
+         if("stop" in name1):
+           l+=1
+           texttospeech("you have stopped the song","welcome{}.mp3".format(l));
+           movie = Movie_MP4(r"F:\new ration\ardunio python\welcome{}.mp3".format(l))
+           movie.play()
+           time.sleep(3)
+           l=l+1
+           texttospeech("{} now do you want to listen more song".format(name),"welcome{}.mp3".format(l));
+           playsound('welcome{}.mp3'.format(l))
+           while(1):
+            try:
+             responseofsong=sppechtotext();
+             if("yes" in responseofsong):
+              song();
+              break;
+             elif("no" in responseofsong):
+              flag=1
+              break;
+             else:
+              l=l+1
+              texttospeech("{} please clearly say".format(name),"welcome{}.mp3".format(l));
+              playsound('welcome{}.mp3'.format(l))
+            except:
+                l=l+1
+                texttospeech("{} please clearly say".format(name),"welcome{}.mp3".format(l));
+                playsound('welcome{}.mp3'.format(l))
+            
+              
+              
+         if("shutdown" in name1):
+            os.system("shutdown /s /t 1");
+            break;
+         if(flag==1):
+            break;
+        except:
+         pass;
+
+        
+
