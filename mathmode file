@@ -1,0 +1,21 @@
+def list(text):
+    l=[]
+    for i in text.split(' '):
+        try:
+            l.append(float(i));
+        except ValueError:
+            pass
+    return l
+def add(a,b):
+    return a+b
+def sub(a,b):
+    return a-b
+def mul(a,b):
+    return a*b
+def div(a,b):
+    return a/b
+particular={"ADD":add,"ADDITION":add,"SUBSTRUCTION":sub,"SUBSTRUCT":sub,"DIVISION":div,"DEVIDE":div,"MULTIPLICATION":mul,"MULTIPLY":mul}
+particular1={"BEAUTIFUL":"Aww, thank you , you just added some sunshine to my day","HOW":"thank you","ARNAB":"ARNAB IS SAIKAT'S FRIEND.HE IS SO CALM MINDED","MANISHA":"MANISHA IS SAIKAT'S SISTER","ANIL":"anil is SO FAT.he also saikat's friend","SAIKAT":"SAIKAT IS MY CREATER","NAME":"MY NAME IS AI robot","THANKS":"IT IS MY PLEASURE","FINE":"HAPPY TO HEAR IT","SAD":"SORRY TO HEAR IT","UNHAPPY":"STAY HAPPY IT IS NEED FOR YOU"}
+
+            
+
